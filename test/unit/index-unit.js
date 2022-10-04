@@ -73,5 +73,26 @@ describe('#index.js', () => {
       assert.property(result, 'tokenIcon')
       assert.property(result, 'fullSizedUrl')
     })
+
+    it('should return data from the cache if the data exists', async () => {
+      // Mock dependencies and force desired code path.
+      sandbox.stub(uut.slpMutableData.get, 'data').resolves(mockData.tokenData01)
+
+      const tokenId = '293f388e3d8d7acb6ad8f0be135ade5ec4f97635cce5484d0326ef558a99e378'
+
+      let result = await uut.getIcon({ tokenId })
+
+      // Call it a second time to exercise the cache.
+      result = await uut.getIcon({ tokenId })
+
+      assert.equal(uut.state.tokenIdsCache.includes(tokenId), true)
+
+      // Assert that the returned object has expected properties.
+      assert.property(result, 'tokenStats')
+      assert.property(result, 'mutableData')
+      assert.property(result, 'immutableData')
+      assert.property(result, 'tokenIcon')
+      assert.property(result, 'fullSizedUrl')
+    })
   })
 })
