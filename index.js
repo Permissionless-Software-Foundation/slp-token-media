@@ -16,6 +16,17 @@ class SlpTokenMedia {
       )
     }
 
+    // cidUrlType has a value of 1 or 2:
+    // 1 - The CID should go at the end, as a directory.
+    // 2 - The CID should go at the beginning of the URL, as a subdomain.
+    this.cidUrlType = 1
+    if (localConfig.cidUrlType) this.cidUrlType = localConfig.cidUrlType
+
+    // The Gateway URL is used to retrieve IPFS data.
+    this.ipfsGatewayUrl = 'ipfs-gateway.fullstackcash.nl' // Type 1 CID URL.
+    // this.ipfsGatewayUrl = 'ipfs.dweb.link/data.json' // Type 2 CID URL.
+    if (localConfig.ipfsGatewayUrl) this.ipfsGatewayUrl = localConfig.ipfsGatewayUrl
+
     // State
     this.state = {
       // The token ID cache is an array of Token IDs that have been processed.
@@ -28,8 +39,14 @@ class SlpTokenMedia {
       tokenDataCache: {}
     }
 
+    const slpMutableDataOptions = {
+      wallet: this.wallet,
+      cidUrlType: this.cidUrlType,
+      ipfsGatewayUrl: this.ipfsGatewayUrl
+    }
+
     // Encapsulate dependencies
-    this.slpMutableData = new SlpMutableData({ wallet: this.wallet })
+    this.slpMutableData = new SlpMutableData(slpMutableDataOptions)
   }
 
   // Get the icon for a token, given it's token ID.

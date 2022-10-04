@@ -26,7 +26,7 @@ describe('#index.js', () => {
     // Clone the mock data.
     mockData = cloneDeep(mockDataLib)
 
-    const wallet = new SlpWallet()
+    const wallet = new SlpWallet(undefined, { interface: 'consumer-api' })
     await wallet.walletInfoPromise
 
     uut = new SlpTokenMedia({ wallet })
@@ -43,6 +43,23 @@ describe('#index.js', () => {
       } catch (err) {
         assert.include(err.message, 'Instance of minimal-slp-wallet must be passed as wallet when instantiating this library.')
       }
+    })
+
+    it('should override default IPFS gateway', async () => {
+      const wallet = new SlpWallet(undefined, { interface: 'consumer-api' })
+      await wallet.walletInfoPromise
+
+      const options = {
+        wallet,
+        cidUrlType: 2,
+        ipfsGatewayUrl: 'test.com'
+      }
+
+      // Mock external dependencies.
+      uut = new SlpTokenMedia(options)
+
+      assert.equal(uut.cidUrlType, 2)
+      assert.equal(uut.ipfsGatewayUrl, 'test.com')
     })
   })
 
