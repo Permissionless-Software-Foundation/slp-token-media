@@ -3,24 +3,28 @@
   Bitcoin Cash wallet.
 */
 
-/* eslint-disable no-async-promise-executor */
-
-'use strict'
-
-const BCHJS = require('@psf/bch-js')
-
-const Util = require('./lib/util')
-const util = new Util()
-
-let _this // local global for 'this'.
-
-class BoilplateLib {
+class SlpTokenMedia {
   constructor () {
-    _this = this
+    // State
+    this.state = {
+      // The token ID cache is an array of Token IDs that have been processed.
+      // Each token ID in the array corresponds to a property in the
+      // tokenDataCache object.
+      tokenIdsCache: [],
 
-    _this.bchjs = new BCHJS()
-    _this.util = util
+      // The token data cache contains data (like the token icon) about the
+      // token. The object has a property that matches the token ID of the token.
+      tokenDataCache: {}
+    }
+  }
+
+  // Get the icon for a token, given it's token ID.
+  async getIcon (tokenId) {
+    // Input validation
+    if (!tokenId || tokenId.length !== 64) {
+      throw new Error('getIcon() requires a 64 character token ID as input.')
+    }
   }
 }
 
-module.exports = BoilplateLib
+module.exports = SlpTokenMedia
