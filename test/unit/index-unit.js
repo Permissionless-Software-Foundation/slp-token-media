@@ -89,6 +89,8 @@ describe('#index.js', () => {
       assert.property(result, 'immutableData')
       assert.property(result, 'tokenIcon')
       assert.property(result, 'fullSizedUrl')
+      assert.property(result, 'optimizedTokenIcon')
+      assert.property(result, 'optimizedFullSizedUrl')
     })
 
     it('should return data from the cache if the data exists', async () => {
@@ -110,6 +112,222 @@ describe('#index.js', () => {
       assert.property(result, 'immutableData')
       assert.property(result, 'tokenIcon')
       assert.property(result, 'fullSizedUrl')
+      assert.property(result, 'optimizedTokenIcon')
+      assert.property(result, 'optimizedFullSizedUrl')
+    })
+  })
+
+  describe('#optimizeUrl', () => {
+    it('should throw an error if entry is empty', () => {
+      try {
+        uut.optimizeUrl()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'optimizeUrl() expects a string or object as input.')
+      }
+    })
+
+    it('should throw an error if entry is neither a string or an object', () => {
+      try {
+        uut.optimizeUrl(123)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'entry is neither a string nor an object')
+      }
+    })
+
+    it('should generate a cidUrlType 1 optimized url from a url with a v1 CID', () => {
+      // Takes a URL with a v1 CID, and returns a Type 1 URL using the preferred gateway.
+
+      const entry = 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg'
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+    })
+
+    it('should generate a cidUrlType 1 optimized url from a url with a v0 CID', () => {
+      // Takes a URL with a v0 CID, and returns a Type 1 URL using the preferred gateway.
+
+      const entry = 'https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/'
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+    })
+
+    it('should generate a cidUrlType 2 optimized url from a url with a v1 CID', () => {
+      // Take a URL with a v1 CID, and returns a Type 2 URL using the preferred gateway.
+
+      const entry = 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg'
+
+      // Force desired code path
+      uut.cidUrlType = 2
+      uut.ipfsGatewayUrl = 'ipfs.dweb.link'
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.dweb.link/sailboat-in-fog.jpg')
+    })
+
+    it('should return original URL when configured for cidUrlType 2 and given a url with a v0 CID', () => {
+      // v0 CIDs are not compatible with a Type 2 URL. In this case, return the original URL.
+
+      const entry = 'https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/'
+
+      // Force desired code path
+      uut.cidUrlType = 2
+      uut.ipfsGatewayUrl = 'ipfs.dweb.link'
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, entry)
+    })
+
+    it('should generate a cidUrlType 1 optimized url from an entry object with an ipfs property and v1 CID', () => {
+      // Takes an object with a v1 CID, and returns a Type 1 URL using the preferred gateway.
+
+      const entry = {
+        default: 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg',
+        ipfs: {
+          cid: 'bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq',
+          path: '/sailboat-in-fog.jpg'
+        }
+      }
+
+      const result = uut.optimizeUrl(entry)
+      console.log('result: ', result)
+
+      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+    })
+
+    it('should generate a cidUrlType 1 optimized url from an entry object with an ipfs property and v0 CID', () => {
+      // Takes an object with a v0 CID, and returns a Type 1 URL using the preferred gateway.
+
+      const entry = {
+        default: 'https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/',
+        ipfs: {
+          cid: 'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco',
+          path: '/wiki/'
+        }
+      }
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+    })
+
+    it('should generate a cidUrlType 2 optimized url from an entry object with an ipfs property and a v1 CID', () => {
+      // Takes an object with a v1 CID, and returns a Type 2 URL using the preferred gateway.
+
+      const entry = {
+        default: 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg',
+        ipfs: {
+          cid: 'bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq',
+          path: '/sailboat-in-fog.jpg'
+        }
+      }
+
+      // Force desired code path
+      uut.cidUrlType = 2
+      uut.ipfsGatewayUrl = 'ipfs.dweb.link'
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.dweb.link/sailboat-in-fog.jpg')
+    })
+
+    it('should return default URL when configured for cidUrlType 2 and given a v0 CID', () => {
+      // v0 CIDs are not compatible with a Type 2 URL. In this case, return the original URL.
+
+      const entry = {
+        default: 'https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/',
+        ipfs: {
+          cid: 'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco',
+          path: '/wiki/'
+        }
+      }
+
+      // Force desired code path
+      uut.cidUrlType = 2
+      uut.ipfsGatewayUrl = 'ipfs.dweb.link'
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, entry.default)
+    })
+
+    it('should generate a cidUrlType 1 optimized url from an entry object with only a default URL', () => {
+      // Takes an object with a v1 CID, and returns a Type 1 URL using the preferred gateway.
+
+      const entry = {
+        default: 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg'
+      }
+
+      const result = uut.optimizeUrl(entry)
+      console.log('result: ', result)
+
+      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+    })
+
+    it('should generate a cidUrlType 1 optimized url from an entry object with only a default URL', () => {
+      // Takes an object with a v0 CID, and returns a Type 1 URL using the preferred gateway.
+
+      const entry = {
+        default: 'https://cloudflare-ipfs.com/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/'
+      }
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+    })
+
+    it('should handle ipfs objects with a prefix', () => {
+      // Takes an object with a v1 CID, and returns a Type 2 URL using the preferred gateway.
+
+      const entry = {
+        default: 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg',
+        ipfs: {
+          cid: 'ipfs://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq',
+          path: '/sailboat-in-fog.jpg'
+        }
+      }
+
+      // Force desired code path
+      uut.cidUrlType = 2
+      uut.ipfsGatewayUrl = 'ipfs.dweb.link'
+
+      const result = uut.optimizeUrl(entry)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.dweb.link/sailboat-in-fog.jpg')
+    })
+
+    it('should throw an error if object has no default property', () => {
+      try {
+        const entry = {
+          ipfs: {
+            cid: 'ipfs://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq',
+            path: '/sailboat-in-fog.jpg'
+          }
+        }
+
+        uut.optimizeUrl(entry)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'Media does not follow PS007. Media is an object, but has no default property.')
+      }
     })
   })
 })
