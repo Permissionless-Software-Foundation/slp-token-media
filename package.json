@@ -3,13 +3,24 @@
   "version": "1.0.0",
   "description": "A library for retrieving SLP token icons and media",
   "main": "index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/slp-token-media.min.js"
+      },
+      "require": {
+        "default": "index.js"
+      }
+    }
+  },
   "scripts": {
     "start": "node index.js",
     "test": "npm run lint && TEST=unit nyc mocha test/unit/",
     "test:integration": "mocha --timeout 25000 test/integration/",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
-    "coverage:report": "nyc --reporter=html mocha test/unit/ --exit"
+    "coverage:report": "nyc --reporter=html mocha test/unit/ --exit",
+    "build": "browserify index.js -p tinyify --s SlpTokenMedia -o dist/slp-token-media.min.js"
   },
   "keywords": [
     "bitcoin",
@@ -32,20 +43,21 @@
   },
   "repository": "Permissionless-Software-Foundation/slp-token-media",
   "dependencies": {
-    "@psf/bch-js": "6.4.5",
-    "slp-mutable-data": "2.2.4"
+    "slp-mutable-data": "2.2.6"
   },
   "devDependencies": {
     "apidoc": "0.53.0",
+    "browserify": "^17.0.0",
     "chai": "4.3.6",
     "husky": "8.0.1",
     "lodash.clonedeep": "4.5.0",
-    "minimal-slp-wallet": "^5.2.1",
+    "minimal-slp-wallet": "5.2.1",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
     "semantic-release": "19.0.5",
     "sinon": "14.0.1",
-    "standard": "17.0.0"
+    "standard": "17.0.0",
+    "tinyify": "^3.1.0"
   },
   "release": {
     "publish": [

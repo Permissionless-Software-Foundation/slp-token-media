@@ -20,7 +20,7 @@ const tokenData01 = {
   },
   mutableData: {
     tokenIcon: 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg',
-    fullSizedUrl: '',
+    fullSizedUrl: 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg',
     about: 'This NFT was created using the PSF Token Studio at https://nft-creator.fullstack.cash',
     userData: ''
   },
