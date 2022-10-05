@@ -115,6 +115,21 @@ describe('#index.js', () => {
       assert.property(result, 'optimizedTokenIcon')
       assert.property(result, 'optimizedFullSizedUrl')
     })
+
+    it('should return token data for a token without mutable data', async () => {
+      // Mock dependencies and force desired code path.
+      sandbox.stub(uut.slpMutableData.get, 'data').resolves(mockData.tokenData02)
+
+      const tokenId = '9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c11'
+
+      const result = await uut.getIcon({ tokenId })
+      console.log('result: ', result)
+
+      // Assert that the returned object has expected properties.
+      assert.property(result, 'tokenStats')
+      assert.property(result, 'tokenIcon')
+      assert.property(result, 'optimizedTokenIcon')
+    })
   })
 
   describe('#optimizeUrl', () => {

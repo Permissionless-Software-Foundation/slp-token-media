@@ -24,6 +24,7 @@ class SlpTokenMedia {
 
     // The Gateway URL is used to retrieve IPFS data.
     this.ipfsGatewayUrl = 'ipfs-gateway.fullstackcash.nl' // Type 1 CID URL.
+    // this.ipfsGatewayUrl = 'p2wdb-gateway.fullstack.cash' // Type 1 CID URL.
     // this.ipfsGatewayUrl = 'ipfs.dweb.link/data.json' // Type 2 CID URL.
     if (localConfig.ipfsGatewayUrl) this.ipfsGatewayUrl = localConfig.ipfsGatewayUrl
 
@@ -50,6 +51,18 @@ class SlpTokenMedia {
   }
 
   // Get the icon for a token, given it's token ID.
+  // This function expects an object input with a tokenId property.
+  // This function returns an object with a tokenIcon property that contains
+  // the URL to the icon.
+  // The output object always have these properties:
+  // - tokenIcon: A url to the token icon, if it exists.
+  // - tokenStats: Data about the token from psf-slp-indexer.
+  // - optimizedTokenIcon: An alternative, potentially more optimal, url to the token icon, if it exists.
+  //
+  // If the token does not follow the PS002 or PS007 specifications, then the
+  // url generate a URL for tokens.bch.sx. But there is no guarntee that site
+  // has an icon. It is up to the app consuming this library to detect if the
+  // url does not resolve and to handle that scenario.
   async getIcon (inObj = {}) {
     try {
       const { tokenId } = inObj
@@ -68,33 +81,52 @@ class SlpTokenMedia {
 
       // Get the mutable data for the token.
       const data = await this.slpMutableData.get.data(tokenId)
-      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
-      // Optimize the media URLs to use the desired IPFS Gateways and URL format.
-      let optimizedTokenIcon = ''
-      if (data.mutableData.tokenIcon) {
-        optimizedTokenIcon = this.optimizeUrl(data.mutableData.tokenIcon)
+      // This is an older token without mutable data.
+      if (!data.mutableData.tokenIcon) {
+        console.log('Token does not have mutale data, looking for token on centralized icon server.')
+
+        const iconRepoStr = `https://tokens.bch.sx/250/${tokenId}.png`
+
+        const dataObj = {
+          tokenIcon: iconRepoStr,
+          tokenStats: data.tokenStats,
+          optimizedTokenIcon: iconRepoStr
+        }
+
+        return dataObj
+
+        //
+      } else {
+        // This token has mutable data associated with it.
+
+        // Optimize the media URLs to use the desired IPFS Gateways and URL format.
+        let optimizedTokenIcon = ''
+        if (data.mutableData.tokenIcon) {
+          optimizedTokenIcon = this.optimizeUrl(data.mutableData.tokenIcon)
+        }
+        let optimizedFullSizedUrl = ''
+        if (data.mutableData.fullSizedUrl) {
+          optimizedFullSizedUrl = this.optimizeUrl(data.mutableData.fullSizedUrl)
+        }
+
+        const dataObj = {
+          tokenStats: data.tokenStats,
+          mutableData: data.mutableData,
+          immutableData: data.immutableData,
+          tokenIcon: data.mutableData.tokenIcon,
+          fullSizedUrl: data.mutableData.fullSizedUrl,
+          optimizedTokenIcon,
+          optimizedFullSizedUrl
+        }
+
+        // Update the caches
+        this.state.tokenIdsCache.push(tokenId)
+        this.state.tokenDataCache[tokenId] = dataObj
+
+        return dataObj
       }
-      let optimizedFullSizedUrl = ''
-      if (data.mutableData.fullSizedUrl) {
-        optimizedFullSizedUrl = this.optimizeUrl(data.mutableData.fullSizedUrl)
-      }
-
-      const dataObj = {
-        tokenStats: data.tokenStats,
-        mutableData: data.mutableData,
-        immutableData: data.immutableData,
-        tokenIcon: data.mutableData.tokenIcon,
-        fullSizedUrl: data.mutableData.fullSizedUrl,
-        optimizedTokenIcon,
-        optimizedFullSizedUrl
-      }
-
-      // Update the caches
-      this.state.tokenIdsCache.push(tokenId)
-      this.state.tokenDataCache[tokenId] = dataObj
-
-      return dataObj
     } catch (err) {
       console.error('Error in getIcon()')
       throw err
