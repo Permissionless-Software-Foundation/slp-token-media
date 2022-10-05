@@ -39,6 +39,27 @@ const tokenData01 = {
   fullSizedUrl: ''
 }
 
+const tokenData02 = {
+  immutableData: {},
+  mutableData: {},
+  tokenStats: {
+    type: 1,
+    ticker: 'USDt',
+    name: 'Tether USDt',
+    tokenId: '9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c11',
+    documentUri: 'https://tether.to',
+    documentHash: '',
+    decimals: 8,
+    mintBatonIsActive: true,
+    tokensInCirculationBN: '599653644767688',
+    tokensInCirculationStr: '599653644767688',
+    blockCreated: 636706,
+    totalBurned: '1597065620238',
+    totalMinted: '601250710387926'
+  }
+}
+
 module.exports = {
-  tokenData01
+  tokenData01,
+  tokenData02
 }
