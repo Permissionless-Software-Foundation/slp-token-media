@@ -70,6 +70,16 @@ describe('#index.js', () => {
 
         assert.fail('Unexpected result')
       } catch (err) {
+        assert.include(err.message, 'tokenId must be passed as a property in an input object')
+      }
+    })
+
+    it('should throw an error if no token ID is too short', async () => {
+      try {
+        await uut.getIcon({ tokenId: 'abc123' })
+
+        assert.fail('Unexpected result')
+      } catch (err) {
         assert.include(err.message, 'getIcon() requires a 64 character token ID as input.')
       }
     })
