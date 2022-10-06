@@ -2,14 +2,14 @@
   "name": "slp-token-media",
   "version": "1.0.0",
   "description": "A library for retrieving SLP token icons and media",
-  "main": "index.js",
+  "main": "./index.js",
   "exports": {
     ".": {
       "import": {
         "default": "./dist/slp-token-media.min.js"
       },
       "require": {
-        "default": "index.js"
+        "default": "./index.js"
       }
     }
   },
@@ -43,15 +43,17 @@
   },
   "repository": "Permissionless-Software-Foundation/slp-token-media",
   "dependencies": {
-    "slp-mutable-data": "2.2.6"
+    "@chris.troutner/retry-queue-commonjs": "1.0.8",
+    "axios": "1.1.0",
+    "slp-mutable-data": "2.2.7"
   },
   "devDependencies": {
     "apidoc": "0.53.0",
-    "browserify": "^17.0.0",
+    "browserify": "17.0.0",
     "chai": "4.3.6",
     "husky": "8.0.1",
     "lodash.clonedeep": "4.5.0",
-    "minimal-slp-wallet": "5.2.1",
+    "minimal-slp-wallet": "5.3.4",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
     "semantic-release": "19.0.5",
@@ -69,7 +71,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint"
+      "pre-commit": "npm run lint && npm run build"
     }
   }
 }

@@ -5,7 +5,7 @@
 // npm libraries
 const assert = require('chai').assert
 const sinon = require('sinon')
-const SlpWallet = require('minimal-slp-wallet/index.js')
+const SlpWallet = require('minimal-slp-wallet')
 const cloneDeep = require('lodash.clonedeep')
 
 // Mocking data libraries.
@@ -77,6 +77,7 @@ describe('#index.js', () => {
     it('should return token data', async () => {
       // Mock dependencies and force desired code path.
       sandbox.stub(uut.slpMutableData.get, 'data').resolves(mockData.tokenData01)
+      sandbox.stub(uut, 'validateUrl').resolves('fake-url')
 
       const tokenId = '293f388e3d8d7acb6ad8f0be135ade5ec4f97635cce5484d0326ef558a99e378'
 
@@ -96,6 +97,7 @@ describe('#index.js', () => {
     it('should return data from the cache if the data exists', async () => {
       // Mock dependencies and force desired code path.
       sandbox.stub(uut.slpMutableData.get, 'data').resolves(mockData.tokenData01)
+      sandbox.stub(uut, 'validateUrl').resolves('fake-url')
 
       const tokenId = '293f388e3d8d7acb6ad8f0be135ade5ec4f97635cce5484d0326ef558a99e378'
 
@@ -123,7 +125,7 @@ describe('#index.js', () => {
       const tokenId = '9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c11'
 
       const result = await uut.getIcon({ tokenId })
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
       // Assert that the returned object has expected properties.
       assert.property(result, 'tokenStats')
@@ -161,7 +163,7 @@ describe('#index.js', () => {
       const result = uut.optimizeUrl(entry)
       // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+      assert.include(result, '.fullstack.cash/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
     })
 
     it('should generate a cidUrlType 1 optimized url from a url with a v0 CID', () => {
@@ -172,7 +174,7 @@ describe('#index.js', () => {
       const result = uut.optimizeUrl(entry)
       // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+      assert.include(result, '.fullstack.cash/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
     })
 
     it('should generate a cidUrlType 2 optimized url from a url with a v1 CID', () => {
@@ -217,9 +219,9 @@ describe('#index.js', () => {
       }
 
       const result = uut.optimizeUrl(entry)
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+      assert.include(result, '.fullstack.cash/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
     })
 
     it('should generate a cidUrlType 1 optimized url from an entry object with an ipfs property and v0 CID', () => {
@@ -236,7 +238,7 @@ describe('#index.js', () => {
       const result = uut.optimizeUrl(entry)
       // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+      assert.include(result, '.fullstack.cash/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
     })
 
     it('should generate a cidUrlType 2 optimized url from an entry object with an ipfs property and a v1 CID', () => {
@@ -289,9 +291,9 @@ describe('#index.js', () => {
       }
 
       const result = uut.optimizeUrl(entry)
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+      assert.include(result, '.fullstack.cash/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
     })
 
     it('should generate a cidUrlType 1 optimized url from an entry object with only a default URL', () => {
@@ -304,7 +306,7 @@ describe('#index.js', () => {
       const result = uut.optimizeUrl(entry)
       // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+      assert.include(result, '.fullstack.cash/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
     })
 
     it('should handle ipfs objects with a prefix', () => {
@@ -343,6 +345,72 @@ describe('#index.js', () => {
       } catch (err) {
         assert.include(err.message, 'Media does not follow PS007. Media is an object, but has no default property.')
       }
+    })
+  })
+
+  describe('#urlIsValid', () => {
+    it('should validate a URL without downloading the file', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut.axios.default, 'head').resolves({ status: 200 })
+
+      const url = 'https://tokens.bch.sx/100/9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c11.png'
+
+      const result = await uut.urlIsValid(url)
+      // console.log('result: ', result)
+
+      assert.equal(result, true)
+    })
+
+    it('should return false for invalid URL', async () => {
+      // Mock dependencies and force desired code path
+      const err = new Error('axios failed')
+      err.response = {
+        status: 404
+      }
+      sandbox.stub(uut.axios.default, 'head').rejects(err)
+
+      const url = 'https://tokens.bch.sx/100/9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c12.png'
+
+      const result = await uut.urlIsValid(url)
+      // console.log('result: ', result)
+
+      assert.equal(result, false)
+    })
+
+    it('should return false if axios returns status 400 or greater', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut.axios.default, 'head').resolves({ status: 400 })
+
+      const url = 'fake-url'
+
+      const result = await uut.urlIsValid(url)
+      // console.log('result: ', result)
+
+      assert.equal(result, false)
+    })
+  })
+
+  describe('#validateUrl', () => {
+    it('should return an empty string if URL is invalid', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'urlIsValid').resolves(false)
+
+      const url = 'fake-url'
+
+      const result = await uut.validateUrl(url)
+
+      assert.equal(result, '')
+    })
+
+    it('should return URL if it is valid', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'urlIsValid').resolves(true)
+
+      const url = 'fake-url'
+
+      const result = await uut.validateUrl(url)
+
+      assert.equal(result, 'fake-url')
     })
   })
 })
