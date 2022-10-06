@@ -63,11 +63,9 @@ class SlpTokenMedia {
   // - tokenIcon: A url to the token icon, if it exists.
   // - tokenStats: Data about the token from psf-slp-indexer.
   // - optimizedTokenIcon: An alternative, potentially more optimal, url to the token icon, if it exists.
+  // - iconRepoCompatible: true if the token icon is available via token.bch.sx
+  // - ps002Compatible: true if the token icon is compatible with PS007 specification.
   //
-  // If the token does not follow the PS002 or PS007 specifications, then the
-  // url generate a URL for tokens.bch.sx. But there is no guarntee that site
-  // has an icon. It is up to the app consuming this library to detect if the
-  // url does not resolve and to handle that scenario.
   async getIcon (inObj = {}) {
     try {
       const { tokenId } = inObj
@@ -103,6 +101,11 @@ class SlpTokenMedia {
           iconRepoCompatible,
           ps002Compatible: false
         }
+
+        // Update the caches
+        this.state.tokenIdsCache.push(tokenId)
+        this.state.tokenDataCache[tokenId] = dataObj
+        console.log(`info: slp-token-media cache has ${this.state.tokenDataCache.length} entries.`)
 
         return dataObj
 
@@ -143,6 +146,7 @@ class SlpTokenMedia {
         // Update the caches
         this.state.tokenIdsCache.push(tokenId)
         this.state.tokenDataCache[tokenId] = dataObj
+        console.log(`info: slp-token-media cache has ${this.state.tokenDataCache.length} entries.`)
 
         return dataObj
       }
