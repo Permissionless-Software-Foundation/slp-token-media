@@ -345,4 +345,34 @@ describe('#index.js', () => {
       }
     })
   })
+
+  describe('#urlIsValid', () => {
+    it('should validate a URL without downloading the file', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut.axios.default, 'head').resolves({ status: 200 })
+
+      const url = 'https://tokens.bch.sx/100/9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c11.png'
+
+      const result = await uut.urlIsValid(url)
+      // console.log('result: ', result)
+
+      assert.equal(result, true)
+    })
+
+    it('should return false for invalid URL', async () => {
+      // Mock dependencies and force desired code path
+      const err = new Error('axios failed')
+      err.response = {
+        status: 404
+      }
+      sandbox.stub(uut.axios.default, 'head').rejects(err)
+
+      const url = 'https://tokens.bch.sx/100/9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c12.png'
+
+      const result = await uut.urlIsValid(url)
+      // console.log('result: ', result)
+
+      assert.equal(result, false)
+    })
+  })
 })

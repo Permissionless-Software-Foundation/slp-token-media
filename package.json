@@ -43,6 +43,8 @@
   },
   "repository": "Permissionless-Software-Foundation/slp-token-media",
   "dependencies": {
+    "@chris.troutner/retry-queue-commonjs": "1.0.8",
+    "axios": "1.1.0",
     "slp-mutable-data": "2.2.7"
   },
   "devDependencies": {

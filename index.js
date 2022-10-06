@@ -5,6 +5,8 @@
 
 // Global npm libraries
 const { SlpMutableData } = require('slp-mutable-data')
+const axios = require('axios')
+const RetryQueue = require('@chris.troutner/retry-queue-commonjs')
 
 class SlpTokenMedia {
   constructor (localConfig = {}) {
@@ -48,12 +50,15 @@ class SlpTokenMedia {
 
     // Encapsulate dependencies
     this.slpMutableData = new SlpMutableData(slpMutableDataOptions)
+    this.axios = axios
+    this.retryQueue = new RetryQueue({ attempts: 2, retryPeriod: 1000 })
   }
 
   // Get the icon for a token, given it's token ID.
   // This function expects an object input with a tokenId property.
   // This function returns an object with a tokenIcon property that contains
   // the URL to the icon.
+  //
   // The output object always have these properties:
   // - tokenIcon: A url to the token icon, if it exists.
   // - tokenStats: Data about the token from psf-slp-indexer.
@@ -229,6 +234,23 @@ class SlpTokenMedia {
     }
 
     return outStr
+  }
+
+  // This function wraps the axios.head() call. This is used check if a URL is
+  // valid (resolves with a 200 status), without actually downloading the file.
+  async urlIsValid (url) {
+    try {
+      const result = await this.axios.default.head(url)
+
+      if (result.status < 400) return true
+
+      return false
+    } catch (err) {
+      // console.log('error: ', err)
+
+      // 400 and 500 http errors will result in an error.
+      return false
+    }
   }
 }
 
