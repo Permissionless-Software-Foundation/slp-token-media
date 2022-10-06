@@ -77,6 +77,7 @@ describe('#index.js', () => {
     it('should return token data', async () => {
       // Mock dependencies and force desired code path.
       sandbox.stub(uut.slpMutableData.get, 'data').resolves(mockData.tokenData01)
+      sandbox.stub(uut, 'validateUrl').resolves('fake-url')
 
       const tokenId = '293f388e3d8d7acb6ad8f0be135ade5ec4f97635cce5484d0326ef558a99e378'
 
@@ -96,6 +97,7 @@ describe('#index.js', () => {
     it('should return data from the cache if the data exists', async () => {
       // Mock dependencies and force desired code path.
       sandbox.stub(uut.slpMutableData.get, 'data').resolves(mockData.tokenData01)
+      sandbox.stub(uut, 'validateUrl').resolves('fake-url')
 
       const tokenId = '293f388e3d8d7acb6ad8f0be135ade5ec4f97635cce5484d0326ef558a99e378'
 
@@ -123,7 +125,7 @@ describe('#index.js', () => {
       const tokenId = '9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c11'
 
       const result = await uut.getIcon({ tokenId })
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
       // Assert that the returned object has expected properties.
       assert.property(result, 'tokenStats')
@@ -159,7 +161,7 @@ describe('#index.js', () => {
       const entry = 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg'
 
       const result = uut.optimizeUrl(entry)
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
       assert.include(result, '.fullstack.cash/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
     })
@@ -289,7 +291,7 @@ describe('#index.js', () => {
       }
 
       const result = uut.optimizeUrl(entry)
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
       assert.include(result, '.fullstack.cash/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
     })
@@ -373,6 +375,42 @@ describe('#index.js', () => {
       // console.log('result: ', result)
 
       assert.equal(result, false)
+    })
+
+    it('should return false if axios returns status 400 or greater', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut.axios.default, 'head').resolves({ status: 400 })
+
+      const url = 'fake-url'
+
+      const result = await uut.urlIsValid(url)
+      // console.log('result: ', result)
+
+      assert.equal(result, false)
+    })
+  })
+
+  describe('#validateUrl', () => {
+    it('should return an empty string if URL is invalid', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'urlIsValid').resolves(false)
+
+      const url = 'fake-url'
+
+      const result = await uut.validateUrl(url)
+
+      assert.equal(result, '')
+    })
+
+    it('should return URL if it is valid', async () => {
+      // Mock dependencies and force desired code path
+      sandbox.stub(uut, 'urlIsValid').resolves(true)
+
+      const url = 'fake-url'
+
+      const result = await uut.validateUrl(url)
+
+      assert.equal(result, 'fake-url')
     })
   })
 })

@@ -86,7 +86,7 @@ class SlpTokenMedia {
 
       // Get the mutable data for the token.
       const data = await this.slpMutableData.get.data(tokenId)
-      console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
       // This is an older token without mutable data.
       if (!data.mutableData.tokenIcon) {
@@ -94,10 +94,14 @@ class SlpTokenMedia {
 
         const iconRepoStr = `https://tokens.bch.sx/250/${tokenId}.png`
 
+        const iconRepoCompatible = await this.urlIsValid(iconRepoStr)
+
         const dataObj = {
           tokenIcon: iconRepoStr,
           tokenStats: data.tokenStats,
-          optimizedTokenIcon: iconRepoStr
+          optimizedTokenIcon: iconRepoStr,
+          iconRepoCompatible,
+          ps002Compatible: false
         }
 
         return dataObj
@@ -106,24 +110,34 @@ class SlpTokenMedia {
       } else {
         // This token has mutable data associated with it.
 
+        // Validate the token icon
+        const tokenIconUrl = await this.validateUrl(data.mutableData.tokenIcon)
+
+        // Validate the full size URL
+        const tokenFullSizedUrl = await this.validateUrl(data.mutableData.fullSizedUrl)
+
         // Optimize the media URLs to use the desired IPFS Gateways and URL format.
         let optimizedTokenIcon = ''
-        if (data.mutableData.tokenIcon) {
+        if (tokenIconUrl) {
           optimizedTokenIcon = this.optimizeUrl(data.mutableData.tokenIcon)
+          optimizedTokenIcon = await this.validateUrl(optimizedTokenIcon)
         }
         let optimizedFullSizedUrl = ''
-        if (data.mutableData.fullSizedUrl) {
+        if (tokenIconUrl) {
           optimizedFullSizedUrl = this.optimizeUrl(data.mutableData.fullSizedUrl)
+          optimizedFullSizedUrl = await this.validateUrl(optimizedFullSizedUrl)
         }
 
         const dataObj = {
           tokenStats: data.tokenStats,
           mutableData: data.mutableData,
           immutableData: data.immutableData,
-          tokenIcon: data.mutableData.tokenIcon,
-          fullSizedUrl: data.mutableData.fullSizedUrl,
+          tokenIcon: tokenIconUrl,
+          fullSizedUrl: tokenFullSizedUrl,
           optimizedTokenIcon,
-          optimizedFullSizedUrl
+          optimizedFullSizedUrl,
+          iconRepoCompatible: false,
+          ps002Compatible: true
         }
 
         // Update the caches
@@ -136,6 +150,19 @@ class SlpTokenMedia {
       console.error('Error in getIcon()')
       throw err
     }
+  }
+
+  // This function will return a URL if it is valid. Otherwise it returns an
+  // empty string.
+  async validateUrl (url) {
+    let outUrl = ''
+
+    if (url) {
+      const urlIsValid = await this.urlIsValid(url)
+      if (urlIsValid) outUrl = url
+    }
+
+    return outUrl
   }
 
   // This function tries to optimize a media URL by following the PS007 spec.
