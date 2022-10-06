@@ -5,7 +5,7 @@
 // npm libraries
 const assert = require('chai').assert
 const sinon = require('sinon')
-const SlpWallet = require('minimal-slp-wallet/index.js')
+const SlpWallet = require('minimal-slp-wallet')
 const cloneDeep = require('lodash.clonedeep')
 
 // Mocking data libraries.
@@ -159,9 +159,9 @@ describe('#index.js', () => {
       const entry = 'https://bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq.ipfs.w3s.link/sailboat-in-fog.jpg'
 
       const result = uut.optimizeUrl(entry)
-      // console.log('result: ', result)
+      console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+      assert.include(result, '.fullstack.cash/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
     })
 
     it('should generate a cidUrlType 1 optimized url from a url with a v0 CID', () => {
@@ -172,7 +172,7 @@ describe('#index.js', () => {
       const result = uut.optimizeUrl(entry)
       // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+      assert.include(result, '.fullstack.cash/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
     })
 
     it('should generate a cidUrlType 2 optimized url from a url with a v1 CID', () => {
@@ -217,9 +217,9 @@ describe('#index.js', () => {
       }
 
       const result = uut.optimizeUrl(entry)
-      console.log('result: ', result)
+      // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+      assert.include(result, '.fullstack.cash/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
     })
 
     it('should generate a cidUrlType 1 optimized url from an entry object with an ipfs property and v0 CID', () => {
@@ -236,7 +236,7 @@ describe('#index.js', () => {
       const result = uut.optimizeUrl(entry)
       // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+      assert.include(result, '.fullstack.cash/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
     })
 
     it('should generate a cidUrlType 2 optimized url from an entry object with an ipfs property and a v1 CID', () => {
@@ -291,7 +291,7 @@ describe('#index.js', () => {
       const result = uut.optimizeUrl(entry)
       console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
+      assert.include(result, '.fullstack.cash/ipfs/bafybeia5f5sf2avwmegmuy4w4oljcfbt3pj7thrucsg26n3gb65fyteiqq/sailboat-in-fog.jpg')
     })
 
     it('should generate a cidUrlType 1 optimized url from an entry object with only a default URL', () => {
@@ -304,7 +304,7 @@ describe('#index.js', () => {
       const result = uut.optimizeUrl(entry)
       // console.log('result: ', result)
 
-      assert.equal(result, 'https://ipfs-gateway.fullstackcash.nl/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
+      assert.include(result, '.fullstack.cash/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/wiki/')
     })
 
     it('should handle ipfs objects with a prefix', () => {

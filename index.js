@@ -4,7 +4,7 @@
 */
 
 // Global npm libraries
-const { SlpMutableData } = require('slp-mutable-data/index')
+const { SlpMutableData } = require('slp-mutable-data')
 
 class SlpTokenMedia {
   constructor (localConfig = {}) {
@@ -23,8 +23,8 @@ class SlpTokenMedia {
     if (localConfig.cidUrlType) this.cidUrlType = localConfig.cidUrlType
 
     // The Gateway URL is used to retrieve IPFS data.
-    this.ipfsGatewayUrl = 'ipfs-gateway.fullstackcash.nl' // Type 1 CID URL.
-    // this.ipfsGatewayUrl = 'p2wdb-gateway.fullstack.cash' // Type 1 CID URL.
+    // this.ipfsGatewayUrl = 'ipfs-gateway.fullstackcash.nl' // Type 1 CID URL.
+    this.ipfsGatewayUrl = 'p2wdb-gateway-678.fullstack.cash' // Type 1 CID URL.
     // this.ipfsGatewayUrl = 'ipfs.dweb.link/data.json' // Type 2 CID URL.
     if (localConfig.ipfsGatewayUrl) this.ipfsGatewayUrl = localConfig.ipfsGatewayUrl
 

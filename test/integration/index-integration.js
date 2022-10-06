@@ -3,7 +3,7 @@
 */
 
 // Global npm libraries
-const SlpWallet = require('minimal-slp-wallet/index.js')
+const SlpWallet = require('minimal-slp-wallet')
 const assert = require('chai').assert
 
 // Unit under test
