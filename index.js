@@ -184,7 +184,7 @@ class SlpTokenMedia {
   // https://github.com/Permissionless-Software-Foundation/specifications/blob/master/ps007-token-data-schema.md
   optimizeUrl (entry) {
     if (!entry) {
-      throw new Error('optimizeUrl() expects a string or object as input.')
+      return ''
     }
 
     let entryIsString = true

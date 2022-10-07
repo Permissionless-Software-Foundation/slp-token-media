@@ -145,14 +145,10 @@ describe('#index.js', () => {
   })
 
   describe('#optimizeUrl', () => {
-    it('should throw an error if entry is empty', () => {
-      try {
-        uut.optimizeUrl()
+    it('should return empty string if input is empty', () => {
+      const result = uut.optimizeUrl()
 
-        assert.fail('Unexpected code path')
-      } catch (err) {
-        assert.include(err.message, 'optimizeUrl() expects a string or object as input.')
-      }
+      assert.equal(result, '')
     })
 
     it('should throw an error if entry is neither a string or an object', () => {
