@@ -71,7 +71,10 @@ class SlpTokenMedia {
       const { tokenId } = inObj
 
       // Input validation
-      if (!tokenId || tokenId.length !== 64) {
+      if (!tokenId) {
+        throw new Error('tokenId must be passed as a property in an input object')
+      }
+      if (tokenId.length !== 64) {
         throw new Error('getIcon() requires a 64 character token ID as input.')
       }
 
