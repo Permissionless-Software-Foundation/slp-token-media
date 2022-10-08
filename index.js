@@ -114,7 +114,7 @@ class SlpTokenMedia {
 
         //
       } else {
-        // This token has mutable data associated with it.
+        // This token has PS002 mutable data associated with it.
 
         // Validate the token icon
         const tokenIconUrl = await this.validateUrl(data.mutableData.tokenIcon)
@@ -123,16 +123,10 @@ class SlpTokenMedia {
         const tokenFullSizedUrl = await this.validateUrl(data.mutableData.fullSizedUrl)
 
         // Optimize the media URLs to use the desired IPFS Gateways and URL format.
-        let optimizedTokenIcon = ''
-        if (tokenIconUrl) {
-          optimizedTokenIcon = this.optimizeUrl(data.mutableData.tokenIcon)
-          optimizedTokenIcon = await this.validateUrl(optimizedTokenIcon)
-        }
-        let optimizedFullSizedUrl = ''
-        if (tokenIconUrl) {
-          optimizedFullSizedUrl = this.optimizeUrl(data.mutableData.fullSizedUrl)
-          optimizedFullSizedUrl = await this.validateUrl(optimizedFullSizedUrl)
-        }
+        let optimizedTokenIcon = this.optimizeUrl(data.mutableData.tokenIcon)
+        optimizedTokenIcon = await this.validateUrl(optimizedTokenIcon)
+        let optimizedFullSizedUrl = this.optimizeUrl(data.mutableData.fullSizedUrl)
+        optimizedFullSizedUrl = await this.validateUrl(optimizedFullSizedUrl)
 
         const dataObj = {
           tokenStats: data.tokenStats,
