@@ -87,7 +87,7 @@ describe('#index.js', () => {
     it('should return token data', async () => {
       // Mock dependencies and force desired code path.
       sandbox.stub(uut.slpMutableData.get, 'data').resolves(mockData.tokenData01)
-      sandbox.stub(uut, 'validateUrl').resolves('fake-url')
+      sandbox.stub(uut, 'validateUrl').resolvesArg(0)
 
       const tokenId = '293f388e3d8d7acb6ad8f0be135ade5ec4f97635cce5484d0326ef558a99e378'
 
@@ -141,6 +141,20 @@ describe('#index.js', () => {
       assert.property(result, 'tokenStats')
       assert.property(result, 'tokenIcon')
       assert.property(result, 'optimizedTokenIcon')
+    })
+
+    it('should optimize url even if it does not resolves', async () => {
+      // Mock dependencies and force desired code path.
+      sandbox.stub(uut.slpMutableData.get, 'data').resolves(mockData.tokenData03)
+      sandbox.stub(uut, 'validateUrl').resolvesArg(0)
+
+      const tokenId = '293f388e3d8d7acb6ad8f0be135ade5ec4f97635cce5484d0326ef558a99e378'
+
+      const result = await uut.getIcon({ tokenId })
+      // console.log('result: ', result)
+
+      // Optimized token URL should contain the default IPFS gateway url.
+      assert.include(result.optimizedTokenIcon, uut.ipfsGatewayUrl)
     })
   })
 
