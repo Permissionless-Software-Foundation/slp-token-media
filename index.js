@@ -87,7 +87,7 @@ class SlpTokenMedia {
 
       // Get the mutable data for the token.
       const data = await this.slpMutableData.get.data(tokenId)
-      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      console.log(`data: ${JSON.stringify(data, null, 2)}`)
 
       // This is an older token without mutable data.
       if (!data.mutableData.tokenIcon) {
