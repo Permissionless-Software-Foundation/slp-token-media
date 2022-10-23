@@ -108,7 +108,7 @@ class SlpTokenMedia {
         // Update the caches
         this.state.tokenIdsCache.push(tokenId)
         this.state.tokenDataCache[tokenId] = dataObj
-        console.log(`info: slp-token-media cache has ${this.state.tokenDataCache.length} entries.`)
+        console.log(`info: slp-token-media cache has ${this.state.tokenIdsCache.length} entries.`)
 
         return dataObj
 
@@ -143,7 +143,7 @@ class SlpTokenMedia {
         // Update the caches
         this.state.tokenIdsCache.push(tokenId)
         this.state.tokenDataCache[tokenId] = dataObj
-        console.log(`info: slp-token-media cache has ${this.state.tokenDataCache.length} entries.`)
+        console.log(`info: slp-token-media cache has ${this.state.tokenIdsCache.length} entries.`)
 
         return dataObj
       }
