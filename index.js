@@ -91,7 +91,7 @@ class SlpTokenMedia {
 
       // This is an older token without mutable data.
       if (!data.mutableData.tokenIcon) {
-        console.log('Token does not have mutale data, looking for token on centralized icon server.')
+        console.log('Token does not have mutable data, looking for token on centralized icon server.')
 
         const iconRepoStr = `https://tokens.bch.sx/250/${tokenId}.png`
 
