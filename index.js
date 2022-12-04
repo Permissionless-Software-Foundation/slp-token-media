@@ -87,11 +87,11 @@ class SlpTokenMedia {
 
       // Get the mutable data for the token.
       const data = await this.slpMutableData.get.data(tokenId)
-      // console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      // console.log(`slp-mutable-data data: ${JSON.stringify(data, null, 2)}`)
 
       // This is an older token without mutable data.
       if (!data.mutableData.tokenIcon) {
-        console.log('Token does not have mutale data, looking for token on centralized icon server.')
+        console.log('Token does not have mutable data, looking for token on centralized icon server.')
 
         const iconRepoStr = `https://tokens.bch.sx/250/${tokenId}.png`
 
@@ -177,6 +177,8 @@ class SlpTokenMedia {
   // PS007:
   // https://github.com/Permissionless-Software-Foundation/specifications/blob/master/ps007-token-data-schema.md
   optimizeUrl (entry) {
+    // console.log('entry: ', entry)
+
     if (!entry) {
       return ''
     }
@@ -196,10 +198,17 @@ class SlpTokenMedia {
       // This regex is used to extract v0 and v1 CIDs.
       const regex = /Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,}/
 
-      // Extract the CID from the string if it exists.
-      const match = entry.match(regex)
-      const cid = match[0]
-      // console.log('cid: ', cid)
+      let cid = ''
+      try {
+        // Extract the CID from the string if it exists.
+        const match = entry.match(regex)
+        // console.log('match: ', match)
+        cid = match[0]
+        // console.log('cid: ', cid)
+      } catch (err) {
+        // If the regex match throws an error, then return the original entry.
+        return entry
+      }
 
       // Deconstruct the URL
       const url = new URL(entry)
