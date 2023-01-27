@@ -68,7 +68,7 @@ class SlpTokenMedia {
   //
   async getIcon (inObj = {}) {
     try {
-      const { tokenId } = inObj
+      const { tokenId, updateCache } = inObj
 
       // Input validation
       if (!tokenId) {
@@ -79,7 +79,8 @@ class SlpTokenMedia {
       }
 
       // If the data is already in the cache, return that first.
-      if (this.state.tokenIdsCache.includes(tokenId)) {
+      // The user can skip the cache
+      if (this.state.tokenIdsCache.includes(tokenId) && !updateCache) {
         return this.state.tokenDataCache[tokenId]
       }
 
@@ -105,8 +106,11 @@ class SlpTokenMedia {
           ps002Compatible: false
         }
 
-        // Update the caches
-        this.state.tokenIdsCache.push(tokenId)
+        // Update the caches.
+        // Add the token ID if it doesn't already exist.
+        if (!this.state.tokenIdsCache.includes(tokenId)) {
+          this.state.tokenIdsCache.push(tokenId)
+        }
         this.state.tokenDataCache[tokenId] = dataObj
         console.log(`info: slp-token-media cache has ${this.state.tokenIdsCache.length} entries.`)
 
@@ -141,7 +145,9 @@ class SlpTokenMedia {
         }
 
         // Update the caches
-        this.state.tokenIdsCache.push(tokenId)
+        if (!this.state.tokenIdsCache.includes(tokenId)) {
+          this.state.tokenIdsCache.push(tokenId)
+        }
         this.state.tokenDataCache[tokenId] = dataObj
         console.log(`info: slp-token-media cache has ${this.state.tokenIdsCache.length} entries.`)
 
